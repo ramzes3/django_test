@@ -19,8 +19,8 @@ import numpy as np
 
 from .models import shot_information
 
-def index(request):
-    return HttpResponse("Hello, world. You're at the plots index.")
+#def index(request):
+#    return HttpResponse("Hello, world. You're at the plots index.")
 
 def getimage(request, image_id):
 
@@ -46,23 +46,14 @@ def getimage(request, image_id):
         response = HttpResponse(content_type="image/png")
         plt.savefig(response, format="png")
 
-        return response 
+        return response
 
-def inter(request, image_id):
-        path = "/media/Arni1/data/2018/20180219/run006/"
-        listOfEquipment = os.listdir(path)
-        for tmp in listOfEquipment:
-             print(tmp)        
-
-        image_id =1
-        return render(request, 'plots/inter.html',{'image_id': image_id})
-
-def next_image(request, image_id):
-
+def next_image(request, shot_id):
+        shot = get_object_or_404(Question, pk=question_id)
         path = "/media/Arni1/data/2018/20180219/run006/"       
         image_id +=1
 
-        return render(request, 'plots/inter.html',{'image_id': image_id})
+        return render(request, 'plots/display_shot.html',{'shot_id': shot_id})
 
 def previous_image(request, image_id):
         path = "/media/Arni1/data/2018/20180219/run006/"
@@ -82,25 +73,44 @@ def get_path(request, equipment_id):
 
         return path
 
-     
+def inter(request, image_id):
+        path = "/media/Arni1/data/2018/20180219/run006/"
+        listOfEquipment = os.listdir(path)
+        for tmp in listOfEquipment:
+             print(tmp)        
+
+        image_id =1
+        return render(request, 'plots/inter.html',{'image_id': image_id})
+
+def display_shot(request, shot_id):
+        shot = get_object_or_404(shot_information, pk=shot_id)
+        print( shot.root_folder)
+        print(get_shot_dir(request, shot))
+        return HttpResponse("Hello, world. You're at the display shots.")
+
 def index(request):
-        path = "/media/Arni1/data/2018/"
+        path = "/media/Arni1/data/"
         shot_list = shot_information.objects.all()    
-        shot_id = shot_list.filter(user_identifier__startswith='roman')        
-        if shot_id.count()==0:
-            shot_id.create(root_folder=path,user_identifier="roman", aquisition_date=timezone.now())
+        shot = shot_list.filter(user_identifier__startswith='roman')        
+        if shot.count()==0:
+            shot.create(root_folder=path,user_identifier="roman", aquisition_date=timezone.now())
+                     
 
-        shot_id = get_object_or_404(shot_information, user_identifier='roman')
-        print( shot_id.shot )
-        shot_id.shot = 3
-        shot_id.save();
+        shot = get_object_or_404(shot_information, user_identifier='roman')
+        #print( shot.aquisition_date )
+        #shot.run = 1
+        shot.root_folder = path
+        shot.save()   
+        context = {'shot': shot,}
         #shot_id = get_object_or_404(shot_information, pk=question_id)
-        return render(request, 'plots/choose_data.html',{'shot_id': shot_id})
+        return render(request, 'plots/choose_data.html',context)
 
-#return HttpResponse("Hello, world. You're at the plots index.")
+def get_shot_dir(request, shot):        
+        date_folder = ("".join(map(str,[shot.aquisition_date.year, shot.aquisition_date.month, shot.aquisition_date.day])))
+        run_folder = ("".join(map(str,["run",str(shot.run).rjust(3,'0')])))
+        path = os.path.join(shot.root_folder, date_folder,run_folder)
 
-
-#def choose_data(request,image_id):
+        return path
 
 
 

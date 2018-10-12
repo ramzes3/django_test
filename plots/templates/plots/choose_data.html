@@ -3,16 +3,16 @@
 <html>
 <body>
 <div style="text-align:center">
- <h2> Hello {{ shot_id.user_identifier }}</h2>
+ <h2> Hello {{ shot.user_identifier }}</h2>
   <h2>
     Welcome to SCAPA Data Viewer!
   </h2>  
 </div>
 <div style="text-align:center">
-<form action="url 'plots:next_image' shot_id.id" method="post">
+<form action="{% url 'plots:display_shot' shot.id %}" method="post">
     {% csrf_token %}
-    <input type="date" name="Date" value="{{ shot_id.aquisition_date }}" required=True>
-    Run#: <input type="number" value="{{ shot_id.run }}" name="Run" required=True><br>
+    <input type="date" name="Date" value="{{ shot.aquisition_date.year}}-{{ shot.aquisition_date.month}}-{{ shot.aquisition_date.day}}" required=True>
+    Run#: <input type="number" value="{{ shot.run }}" name="Run" required=True><br>
 <input type="submit" value="Check data">
 </form>
 </div>
