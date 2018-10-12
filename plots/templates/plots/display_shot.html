@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+
+<html>
+<body>
+<div style="text-align:center">
+  <h1>
+    Welcome to SCAPA Data Viewer!
+  </h1>  
+</div>
+<div style="text-align:center">
+<form action="url 'plots:next_image' image_id.id" method="post">
+    <input type="date" name="Date" value="{{ image_id.aquisition_date }}" required=True>
+    Run#: <input type="number" value="1" name="Run"><br>
+<input type="submit" value="Check data">
+</form>
+</div>
+
+<div style="text-align:center">
+
+<div style="display:inline-block" >
+Equipment  </br>
+List </br></br></br></br></br></br></br>
+</div>
+
+<div style="display:inline-block" >
+<img src='{% url 'plots:getimage' image_id.shot %}?checks=...' width="500" alt="img" class="img-responsive img-rounded" />
+</div>
+<div style="display:inline-block" >
+<img src='{% url 'plots:getimage' image_id.shot %}?checks=...' width="500" alt="img" class="img-responsive img-rounded" />
+</div>
+<div style="display:inline-block" >
+<img src='{% url 'plots:getimage' image_id.shot %}?checks=...' width="500" alt="img" class="img-responsive img-rounded" />
+</div>
+<div style="text-align:center">
+  <a href='{% url 'plots:previous_image' image_id %}'> Previous </a>  &nbsp;&nbsp;&nbsp; {{image_id}} &nbsp;&nbsp;&nbsp;<a href='{% url 'plots:next_image' image_id %}'> Next</a>
+</div>
+
+</div>
+
+</body>
+</html>
