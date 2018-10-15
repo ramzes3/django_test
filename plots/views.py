@@ -11,19 +11,20 @@ from pylab import *
 import random
 from io import StringIO
 import os, sys
+from datetime import datetime
 
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import PIL, PIL.Image
 import numpy as np
 
-from .models import shot_information
+from .models import Shot_information, Equipment
 
 #def index(request):
 #    return HttpResponse("Hello, world. You're at the plots index.")
 
-def getimage(request, image_id):
-
+def getimage(request, shot_id):
+        shot = get_object_or_404(Shot_information, pk=shot_id)
 #        if request.method=="GET": x = np.arange(0, random.randint(0,3) * np.pi, 0.01)       
 #        else: x = np.arange(0, 2 * np.pi, 0.01)
 #        s = np.cos(x) ** 2
@@ -37,7 +38,7 @@ def getimage(request, image_id):
         path = get_path(path,1)
         print(path)
         listOfImages = [f for f in os.listdir(path) if f.endswith('.png')]
-        img_path = os.path.join(path,listOfImages[image_id]);
+        img_path = os.path.join(path,listOfImages[shot.shot_number]);
         img = mpimg.imread(img_path)
         #A=np.asarray(img)
         plt.imshow(img)
@@ -83,34 +84,54 @@ def inter(request, image_id):
         return render(request, 'plots/inter.html',{'image_id': image_id})
 
 def display_shot(request, shot_id):
-        shot = get_object_or_404(shot_information, pk=shot_id)
-        print( shot.root_folder)
-        print(get_shot_dir(request, shot))
-        return HttpResponse("Hello, world. You're at the display shots.")
+        shot = get_object_or_404(Shot_information, pk=shot_id)
+        shot.run = request.POST['Run']
+        shot.aquisition_date = datetime.strptime(request.POST['Date'], "%Y-%m-%d").date()
+        shot_dir = get_shot_dir(request, shot)        
+        print(shot.aquisition_date)
+        print(shot_dir)
+        shot.save()
+
+        print(shot.equipment_set.all().count())
+        shot.equipment_set.all().delete()
+        if not os.path.isdir(shot_dir):
+             return HttpResponse("There is no data available on this day")
+
+        listOfEquipment = os.listdir(shot_dir)
+        
+        for tmp in listOfEquipment:
+             print(tmp)  
+             shot.equipment_set.create(equipment_name=tmp,equipment_folder=os.path.join(shot_dir,tmp))
+             #path = os.path.join(shot_dir,tmp)
+
+        context = {'shot': shot, 'c_date':str(shot.aquisition_date),}
+        return render(request, 'plots/display_shot.html',context)
+        #return HttpResponse("Hello, world. You're at the display shots.")
 
 def index(request):
         path = "/media/Arni1/data/"
-        shot_list = shot_information.objects.all()    
+        shot_list = Shot_information.objects.all()    
         shot = shot_list.filter(user_identifier__startswith='roman')        
         if shot.count()==0:
-            shot.create(root_folder=path,user_identifier="roman", aquisition_date=timezone.now())
+            Shot_information.create(root_folder=path,user_identifier="roman", aquisition_date=timezone.now())
                      
 
-        shot = get_object_or_404(shot_information, user_identifier='roman')
-        #print( shot.aquisition_date )
+        shot = get_object_or_404(Shot_information, user_identifier='roman')
+        print( str(shot.aquisition_date) )
         #shot.run = 1
         shot.root_folder = path
         shot.save()   
-        context = {'shot': shot,}
-        #shot_id = get_object_or_404(shot_information, pk=question_id)
+        context = {'shot': shot, 'c_date':str(shot.aquisition_date),}
+        #shot_id = get_object_or_404(Shot_information, pk=question_id)
         return render(request, 'plots/choose_data.html',context)
 
 def get_shot_dir(request, shot):        
-        date_folder = ("".join(map(str,[shot.aquisition_date.year, shot.aquisition_date.month, shot.aquisition_date.day])))
+        date_folder = ("".join(map(str,[shot.aquisition_date.year, str(shot.aquisition_date.month).rjust(2,'0'), str(shot.aquisition_date.day).rjust(2,'0')])))
         run_folder = ("".join(map(str,["run",str(shot.run).rjust(3,'0')])))
-        path = os.path.join(shot.root_folder, date_folder,run_folder)
+        path = os.path.join(shot.root_folder, str(shot.aquisition_date.year), date_folder,run_folder)
 
         return path
+
 
 
 

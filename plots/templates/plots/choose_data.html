@@ -11,7 +11,8 @@
 <div style="text-align:center">
 <form action="{% url 'plots:display_shot' shot.id %}" method="post">
     {% csrf_token %}
-    <input type="date" name="Date" value="{{ shot.aquisition_date.year}}-{{ shot.aquisition_date.month}}-{{ shot.aquisition_date.day}}" required=True>
+    <input type="date" name="Date" value="{{ c_date}}" required=True>
+
     Run#: <input type="number" value="{{ shot.run }}" name="Run" required=True><br>
 <input type="submit" value="Check data">
 </form>
