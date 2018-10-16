@@ -38,8 +38,9 @@ def getimage(request, shot_id):
         #plt.title('Simple Graph!')
         #plt.grid(True)
         plt.figure(1) 
+        plt.clf()
         for counter, tmp in enumerate(listOfEquipment):
-           print(tmp)
+           #print(tmp)
            #print(tmp.equipment_folder)
            listOfImages = [f for f in os.listdir(tmp.equipment_folder) if f.endswith('.png')]           
            ax1 = plt.subplot(3,3,counter+1)             # the first subplot in the first figure 
@@ -50,11 +51,12 @@ def getimage(request, shot_id):
            plt.title(tmp.equipment_name)
            #print(len(listOfImages))
            if len(listOfImages) < shot.shot_number:
-                ax1.annotate('Shot not present',xy=(0.1,0.5));
-                continue;
-           img_path = os.path.join(tmp.equipment_folder,listOfImages[shot.shot_number]);
-           img = mpimg.imread(img_path)
+                ax1.annotate('Shot not present',xy=(0.1,0.5))
+                continue
 
+           img_path = os.path.join(tmp.equipment_folder,listOfImages[shot.shot_number-1]);
+           img = mpimg.imread(img_path)
+           #print(tmp)
            plt.imshow(img)
 
 
