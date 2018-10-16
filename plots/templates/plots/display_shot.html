@@ -12,8 +12,11 @@
     {% csrf_token %}
     <input type="date" name="Date" value="{{ c_date}}" required=True>
 
-    Run#: <input type="number" value="{{ shot.run }}" name="Run" required=True><br>
-<input type="submit" value="Check data">
+    Run#: <input type="number" value="{{ shot.run }}" name="Run" required=True> <br>
+  <input type="submit" style="display: none;">
+  <input type="submit" value="Previous" name="Previous">  &nbsp;&nbsp;&nbsp;     Shot#: <input type="number" value="{{ shot.shot_number }}" name="Shot_number" style="width: 5em" required=True> &nbsp;&nbsp;&nbsp;<input type="submit" value="Next" name="Next">
+
+<br>
 </form>
 </div>
 
@@ -21,7 +24,7 @@
 
 
 <div style="display:inline-block" >
-<img src='{% url 'plots:getimage' shot.id %}?checks=...' width="500" alt="img" class="img-responsive img-rounded" />
+<img src='{% url 'plots:getimage' shot.id %}?checks=...' width="1000" alt="img" class="img-responsive img-rounded" />
 </div>
 
 </div>
